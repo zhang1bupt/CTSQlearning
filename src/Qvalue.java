@@ -7,7 +7,7 @@ public class Qvalue {
 	public static void main(String[] args) {
 		Vector<State> Allstates = new Vector<State>();
 		ArrayList<Action> Actions = new ArrayList<Action>();
-		setup s = new setup(5, 4);
+		setup s = new setup(5, 5);
 		s.decideStates();
 		//1. setGivenRewards to set the Given Rewards
 		//2. setZeroRewards to set the Rewards zero for all the Terminal states
@@ -42,9 +42,9 @@ public class Qvalue {
 
 			State cur_state = getRandomState(states);
 
-			while (cur_state.getType().equals("UR")) {
-				cur_state = getRandomState(states);
-			}
+//			while (cur_state.getType().equals("UR")) {
+//				cur_state = getRandomState(states);
+//			}
 			boolean value = false;
 			State GoalState = null;
 			Action ActionatGoalState = null;

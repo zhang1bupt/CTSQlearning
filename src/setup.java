@@ -19,6 +19,7 @@ public class setup {
 	static final int ACTION_DOWN = 1;
 	static final int ACTION_LEFT = 2;
 	static final int ACTION_RIGHT = 3;
+
 	Random r = new Random();
 
 	public setup(int row, int col) {
@@ -39,7 +40,7 @@ public class setup {
 		// Actions.add(ACTION_LEFT);
 		// Actions.add(ACTION_RIGHT);
 
-		int k = 0;
+		int k = 1;
 		for (int i = 0; i < m_row; i++) {
 			for (int j = 0; j < m_col; j++) {
 
@@ -55,10 +56,11 @@ public class setup {
 
 		AllActions = new ArrayList<Action>();
 
-		AllActions.add(new Action(0, 0.8, 0.2, 0.0, 0.0));
+		//AllActions.add(new Action(0, 0.8, 0.2, 0.0, 0.0));//changed
+		AllActions.add(new Action(0, 1.0, 0.0, 0.0, 0.0));
 		AllActions.add(new Action(1, 0.0, 1.0, 0.0, 0.0));
 		AllActions.add(new Action(2, 0.0, 0.0, 1.0, 0.0));
-		AllActions.add(new Action(3, 0.0, 0.2, 0.0, 0.8));
+		AllActions.add(new Action(3, 0.0, 0.0, 0.0, 1.0));//第三个参数由0.2改成0，第五个参数由0.8改成1.0
 
 		System.out.println();
 
@@ -125,7 +127,7 @@ public class setup {
 					take_action = "RIGHT";
 				else if (action == -1)
 					take_action = "NA";
-				if (i == 0 && j == 3)
+				if (i == 0 && j == 4)
 					take_action = "STAY";
 
 				System.out.print(take_action + "\t");
@@ -140,27 +142,27 @@ public class setup {
 		for (int i = 0; i < m_row; i++) {
 			for (int j = 0; j < m_col; j++) {
 				// Set the Start State
-				if (i == 4 && j == 0)
+				if (i == 0 && j == 0)
 					grid[i][j].setType("S");
 				// Set the Goal State
-				else if (i == 0 && j == 3)
+				else if (i == 0 && j == 4)
 					grid[i][j].setType("G");
-
-				// Set the Unreachable states
-				else if (i == 3 && j == 1)
-
-					grid[i][j].setType("UR");
-
-				else if (i == 3 && j == 3)
-
-					grid[i][j].setType("UR");
-
-				else if (i == 1 && j == 1)
-					grid[i][j].setType("P");
-
-				else
-					// Set rest Terminal states
-					grid[i][j].setType("T");
+//
+//				// Set the Unreachable states
+//				else if (i == 3 && j == 1)
+//
+//					grid[i][j].setType("UR");
+//
+//				else if (i == 3 && j == 3)
+//
+//					grid[i][j].setType("UR");
+//
+//				else if (i == 1 && j == 1)
+//					grid[i][j].setType("P");
+//
+//				else
+//					// Set rest Terminal states
+//					grid[i][j].setType("T");
 			}
 
 		}
@@ -176,16 +178,37 @@ public class setup {
 		//Set Zero Rewards Except for the Goal and Pitt State
 		for (int i = 0; i < m_row; i++) {
 			for (int j = 0; j < m_col; j++) {
-				if (i == 0 && j == 3)
+				if(i >= j){
+					grid[i][j].setReward(-10);
+				}else if (i == 0 && j == 4){
 					grid[i][j].setReward(10);
-				else if (i == 1 && j == 1)
-					grid[i][j].setReward(-50);
-				else
+				}else{
 					grid[i][j].setReward(0);
+				}
+//				if (i == 0 && j == 4)
+//					grid[i][j].setReward(10);
+//				else if (i == 4 && j == 0)
+//					grid[i][j].setReward(-10);
+//				else
+//					grid[i][j].setReward(0);
 			}
 
 		}
 	}
+//	public void setZeroRewards() {
+//		//Set Zero Rewards Except for the Goal and Pitt State
+//		for (int i = 0; i < m_row; i++) {
+//			for (int j = 0; j < m_col; j++) {
+//				if (i == 0 && j == 3)
+//					grid[i][j].setReward(10);
+//				else if (i == 1 && j == 1)
+//					grid[i][j].setReward(-50);
+//				else
+//					grid[i][j].setReward(0);
+//			}
+//
+//		}
+//	}
 
 	public HashMap<Integer, Double> get_validProbOnly(Action A) {
 		
@@ -309,8 +332,7 @@ public class setup {
 	public ArrayList<Action> get_Actions() {
 		return AllActions;
 	}
-
-	public State get_nextState(State S, Action A, int dir) {
+/*	public State get_nextState(State S, Action A, int dir) {
 		State nextState = null;
 
 		// get row and col coordinate of the current state
@@ -359,6 +381,53 @@ public class setup {
 				// ignore the ureachable state
 				if (nextState.getType().equals("UR"))
 					nextState = null;
+			}
+
+		}
+
+		return nextState;
+	}*/
+	public State get_nextState(State S, Action A, int dir) {
+		State nextState = null;
+
+		// get row and col coordinate of the current state
+
+		int row, col;
+
+		row = S.row_pos;
+		col = S.col_pos;
+
+		// if up is the action
+		if (dir == 0) {
+			if (row == 0)
+				nextState = null;
+			else {
+				nextState = grid[row - 1][col];
+			}
+			// if down is the action
+		} else if (dir == 1) {
+			if (row == 4)
+				nextState = null;
+			else {
+				nextState = grid[row + 1][col];
+				// ignore the unreachable state
+			}
+			// if left is the action
+		} else if (dir == 2) {
+			if (col == 0)
+				nextState = null;
+			else {
+				nextState = grid[row][col - 1];
+				// ignore the unreachable state
+			}
+
+			// if right is the action
+		} else if (dir == 3) {
+			if (col == 4)
+				nextState = null;
+			else {
+				nextState = grid[row][col + 1];
+				// ignore the ureachable state
 			}
 
 		}
