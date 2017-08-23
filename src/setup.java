@@ -5,6 +5,8 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import com.test.Data;
+
 public class setup {
 
 	private State[][] grid;
@@ -32,7 +34,6 @@ public class setup {
 
 		// Create Grid
 		grid = new State[m_row][m_col];
-
 		// Set the Action
 		// Actions = new ArrayList<Integer>();
 		// Actions.add(ACTION_UP);
@@ -137,7 +138,9 @@ public class setup {
 		}
 	}
 
-	public void decideStates() {
+	public void decideStates(Data data ) {
+		int constaintsatisf_num = data.getNum_constraint_sat();
+		int total_constaintsatisf_num = data.getNum_constraint_solve();
 		// TODO Auto-generated method stub
 		for (int i = 0; i < m_row; i++) {
 			for (int j = 0; j < m_col; j++) {
@@ -145,7 +148,38 @@ public class setup {
 				if (i == 0 && j == 0)
 					grid[i][j].setType("S");
 				// Set the Goal State
-				else if (i == 0 && j == 4)
+				else if (constaintsatisf_num == total_constaintsatisf_num)
+					grid[i][j].setType("G");
+//
+//				// Set the Unreachable states
+//				else if (i == 3 && j == 1)
+//
+//					grid[i][j].setType("UR");
+//
+//				else if (i == 3 && j == 3)
+//
+//					grid[i][j].setType("UR");
+//
+//				else if (i == 1 && j == 1)
+//					grid[i][j].setType("P");
+//
+//				else
+//					// Set rest Terminal states
+//					grid[i][j].setType("T");
+			}
+
+		}
+	}
+	public void decideStates( ) {
+		
+		// TODO Auto-generated method stub
+		for (int i = 0; i < m_row; i++) {
+			for (int j = 0; j < m_col; j++) {
+				// Set the Start State
+				if (i == 0 && j == 0)
+					grid[i][j].setType("S");
+				// Set the Goal State
+				else if (i == 2 && j == 2)
 					grid[i][j].setType("G");
 //
 //				// Set the Unreachable states
@@ -173,8 +207,32 @@ public class setup {
 	// 0 for Unreacheable States
 	// +10 for the Goal state
 	// -50 for the Pit
+	//采用数据
+	public void setZeroRewards(Data data) {
+		//Set Zero Rewards Except for the Goal and Pitt State
+	    int [][] grid1 =data.buildRewardMatrix(-2, 2, 2);
+		for (int i = 0; i < m_row; i++) {
+			for (int j = 0; j < m_col; j++) {
+				grid[i][j].setReward(grid1[i][j]);
+//				if(i >= j){
+//					grid[i][j].setReward(-10);
+//				}else if (i == 0 && j == 4){
+//					grid[i][j].setReward(10);
+//				}else{
+//					grid[i][j].setReward(0);
+//				}
+//				if (i == 0 && j == 4)
+//					grid[i][j].setReward(10);
+//				else if (i == 4 && j == 0)
+//					grid[i][j].setReward(-10);
+//				else
+//					grid[i][j].setReward(0);
+			}
 
-	public void setZeroRewards() {
+		}
+	}
+	//原来R矩阵
+	public void setZeroRewards( ) {
 		//Set Zero Rewards Except for the Goal and Pitt State
 		for (int i = 0; i < m_row; i++) {
 			for (int j = 0; j < m_col; j++) {

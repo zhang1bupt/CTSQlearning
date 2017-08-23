@@ -1,22 +1,26 @@
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
-
+import com.test.*;
 public class Qvalue {
 
 	public static void main(String[] args) {
 		Vector<State> Allstates = new Vector<State>();
 		ArrayList<Action> Actions = new ArrayList<Action>();
 		setup s = new setup(5, 5);
-		s.decideStates();
+		Data data = new Data();
+		//s.decideStates();
 		//1. setGivenRewards to set the Given Rewards
 		//2. setZeroRewards to set the Rewards zero for all the Terminal states
 		//except the pitt and the Goal State
-		
 		//s.setGivenRewards();
-		s.setZeroRewards();
+		s.setZeroRewards(data);
+		s.decideStates(data);
+		//s.setZeroRewards();
 		System.out.println("State of Rewards");
 		s.printRewards();
+		System.out.println();
+		data.printRewardState();
 		System.out.println();
 		s.set_states();
 
@@ -146,6 +150,7 @@ public class Qvalue {
 	private static void printGrid(Vector<State> states) {
 		// TODO Auto-generated method stub
 		// DecimalFormat = new DecimalFormat();
+		ArrayList state_epo = new ArrayList();
 		System.out.println("State\tUP\tDOWN\tLEFT\tRIGHT");
 		System.out
 				.println("---------------------------------------------------");
@@ -159,7 +164,26 @@ public class Qvalue {
 
 		}
 	}
-
+	public static void getMaxAction(Vector<State> states){
+		ArrayList state_epo = new ArrayList();
+		System.out.println("State\tUP\tDOWN\tLEFT\tRIGHT");
+		System.out
+				.println("---------------------------------------------------");
+		for (State s : states) {
+			System.out.print(s.getName());
+			System.out.print("\t" + String.format("%.1f", s.getqUval()));
+			System.out.print("\t" + String.format("%.1f", s.getqDval()));
+			System.out.print(" \t" + String.format("%.1f", s.getqLval()));
+			System.out.print("\t" + String.format("%.1f", s.getqRval()));
+			System.out.println();
+			state_epo.add(s.getqUval());//ио	
+			state_epo.add(s.getqDval());//об
+			state_epo.add(s.getqLval());//вС	
+			state_epo.add(s.getqRval());//ср
+			
+		}
+		
+	}
 	public static State getRandomState(Vector<State> valid_states) {
 		int size = valid_states.size();
 		int item = new Random().nextInt(size);

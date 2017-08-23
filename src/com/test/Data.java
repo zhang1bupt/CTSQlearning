@@ -13,20 +13,38 @@ import java.util.Scanner;
 
 public class Data {
 	static Map statemap = new HashMap();
+	static int num_constraint_sat =0;
+	public int getNum_constraint_sat() {
+		return num_constraint_sat;
+	}
+
+	public void setNum_constraint_sat(int num_constraint_sat) {
+		this.num_constraint_sat = num_constraint_sat;
+	}
+	static int num_constraint_solve = 0;
+	public static int getNum_constraint_solve() {
+		return num_constraint_solve;
+	}
+
+	public static void setNum_constraint_solve(int num_constraint_solve) {
+		Data.num_constraint_solve = num_constraint_solve;
+	}
 
 	public static void main(String[] args) throws FileNotFoundException {
 
-		int num_constraint_solve = 2;
-		int num_constraint_sat = 0;
+		//int num_constraint_solve = 0;//约束个数	
+		//int num_constraint_sat = 0;
 		int count_constaint = 1;
 		String cons_str = "";
 		ArrayList<String> array = new ArrayList<String>();
+		
 		ArrayList real_list = new ArrayList();
 		real_list.add(2);
 		real_list.add(2);
+		real_list.add(2);
 		// 读取数据
-		array = readFileByLines("data.txt");
-
+		array = readFileByLines("data1.txt");
+		num_constraint_solve = array.size();
 		// Scanner sc = new Scanner(System.in);
 		// while (count_constaint <= num_constraint_solve) {
 		// cons_str = sc.nextLine();
@@ -70,8 +88,14 @@ public class Data {
 			ArrayList var_list = new ArrayList<>();
 			for (int j = 0; j < current_str.length(); j++) {
 				char current_char = current_str.charAt(j);
+				char next_char = 0;
+				//获取下一个字符
+				if(j != current_str.length()-1){
+				  next_char = current_str.charAt(j+1);
+				}
+				
 				if (current_char == '+' || current_char == '-' || current_char == '*' || current_char == '='
-						|| current_char == '<' || current_char == '>') {
+						|| current_char == '<' || current_char == '>' || (current_char == '!' && next_char =='=')|| (current_char == '<'&&next_char=='=')|| (current_char == '>'&&next_char=='=')) {
 
 					var_list.add(var_str);
 					var_list.add(current_char);
@@ -214,40 +238,80 @@ public class Data {
 		int leftsum = 0;
 		int left_num = 0;
 		int right_num = 0;
-		int cheng_resullt= 0;
+		int cheng_resullt= 0;//乘号两边的乘积
 	//	ArrayList cheng_result = new ArrayList();
 		int list_size = var_list.size();
 		int last_cons = Integer.parseInt(var_list.get(list_size - 1).toString());
-		//遍历所有乘号，并求所有乘号的积
+		int flag = 0;
+		//判断是否有特殊符号
 		for (int temp = 0; temp < var_list.size(); temp++) {
 			Object test = var_list.get(temp);
 			String str = test.toString();
-			if (str.toString().equals("*")) {// 2*2+3*2=10 1+2=3
-				// Object test1 = var_list.get(temp+1);
-				right_num = Integer.parseInt((var_list.get(temp - 1)).toString());
-				left_num = Integer.parseInt((var_list.get(temp + 1)).toString());
-				cheng_resullt = left_num * right_num;
-				leftsum = leftsum + cheng_resullt;
-	//			cheng_result.add(cheng_resullt);
+			if(str.equals("*")){
+				flag = 1;
 			}
-			if (str.equals("+") && !var_list.get(temp + 2).toString().equals("*")) {
-				leftsum = leftsum + Integer.parseInt((var_list.get(temp + 1)).toString());
-				}else{
-					continue;
-				}
+			if(str.equals("^")){
+				flag = 2;
+			}
 		}
-//		for(int i = 0;i < cheng_result.size();i++){
-//			cheng_resullt = cheng_resullt + (int)cheng_result.get(i);
-//		}
-		if(!var_list.contains("*")){
+		//flag = 0,代表约束表达式没有*号
+		if( flag == 0){
+			leftsum = Integer.parseInt((var_list.get(0)).toString());
 			for (int temp = 0; temp < var_list.size(); temp++) {
 				Object test = var_list.get(temp);
-				String str = test.toString();
-				if (str.equals("+") ) {
+				String str = test.toString();	
+				if (str.equals("+") ) {	
 					leftsum = leftsum + Integer.parseInt((var_list.get(temp + 1)).toString());	
 				}
 			}
 		}
+		//有乘号的情况
+		if(flag == 1){
+			//遍历所有乘号，并求所有乘号的积
+			for (int temp = 0; temp < var_list.size(); temp++) {
+				Object test = var_list.get(temp);
+				String str = test.toString();
+				if (str.toString().equals("*")) {// 2*2+3*2=10 1+2=3
+					// Object test1 = var_list.get(temp+1);
+					right_num = Integer.parseInt((var_list.get(temp + 1)).toString());
+					left_num = Integer.parseInt((var_list.get(temp - 1)).toString());
+					cheng_resullt = left_num * right_num;
+					leftsum = leftsum + cheng_resullt;
+		//			cheng_result.add(cheng_resullt);
+				}
+				if (str.equals("+") && !var_list.get(temp + 2).toString().equals("*")) {
+					leftsum = leftsum + Integer.parseInt((var_list.get(temp + 1)).toString());
+					}else{
+						continue;
+					}
+			}
+		}
+		if(flag == 2){
+			//遍历所有^，并求所有乘号的积
+			for (int temp = 0; temp < var_list.size(); temp++) {
+				Object test = var_list.get(temp);
+				String str = test.toString();
+				if (str.toString().equals("^")) {// 2*2+3*2=10 1+2=3
+					// Object test1 = var_list.get(temp+1);
+					right_num = Integer.parseInt((var_list.get(temp + 1)).toString());
+					left_num = Integer.parseInt((var_list.get(temp - 1)).toString());
+					cheng_resullt = (int) Math.pow(left_num, right_num);
+					leftsum = leftsum + cheng_resullt;
+		//			cheng_result.add(cheng_resullt);
+				}
+				if (str.equals("+") && !var_list.get(temp + 2).toString().equals("*")) {
+					leftsum = leftsum + Integer.parseInt((var_list.get(temp + 1)).toString());
+					}else{
+						continue;
+					}
+			}
+		}
+		
+
+//		for(int i = 0;i < cheng_result.size();i++){
+//			cheng_resullt = cheng_resullt + (int)cheng_result.get(i);
+//		}
+
 		//单独处理没有乘号的情况
 //		for (int temp = 0; temp < var_list.size(); temp++) {
 //			Object test = var_list.get(temp);
@@ -393,11 +457,12 @@ public class Data {
 		if (var_num < 1) {
 			return null;
 		}
+		String filename = "data1.txt";
 		// 变量数量为：1
 		if (var_num == 1) {
 			for (int i1 = 0; i1 < row; i1++) {
 				real_list.add(min);
-				grid[0][i1] = countReward(real_list);
+				grid[0][i1] = countReward(real_list,filename);
 				real_list.remove(0);
 				min++;
 			}
@@ -408,14 +473,14 @@ public class Data {
 			int min1 = min;// 第一层循环的起始点
 			for (int i1 = 0; i1 < row; i1++) {
 				int min2 = min;// 第二层循环的起始点
-				for (int i2 = 0; i2 < col; i2++) {
+				for (int i2 = 0; i2 < row; i2++) {
 					if (real_list.isEmpty()) {
 						real_list.add(min1);
 					}
 					real_list.add(min2);
 					String info = "S" + index;
 					String state = ":{x1:" + real_list.get(0) + ",x2:" + real_list.get(1) + "}";
-					grid[i1][i2] = countReward(real_list);
+					grid[i1][i2] = countReward(real_list,filename);
 					statemap.put(info, state);
 					real_list.remove(1);
 					min2++;
@@ -428,19 +493,35 @@ public class Data {
 		}
 		// 变量数量为：3
 		if (var_num == 3) {
+			int index = 1;
+			int min1 = min;// 第一层循环的起始点
 			for (int i1 = 0; i1 < row; i1++) {
-				for (int i2 = 0; i2 < col; i2++) {
-					for (int i3 = 0; i3 < col; i3++) {
-						real_list.add(i1);
-						real_list.add(i2);
-						real_list.add(i3);
-						grid[i1][i2] = countReward(real_list);
+				int min2 = min;// 第二层循环的起始点
+				for (int i2 = 0; i2 < row; i2++) {
+					int min3 = min;
+					for (int i3 = 0; i3 < row; i3++) {
+						if (real_list.isEmpty()) {
+							real_list.add(min1);
+						}
+						real_list.add(min2);
+						real_list.add(min3);
+						String info = "S" + index;
+						String state = ":{x1:" + real_list.get(0) + ",x2:" + real_list.get(1) +",x3:" + real_list.get(2) + "}";
+						grid[5*i1+i2][i3] = countReward(real_list,filename);
+						statemap.put(info, state);
 						real_list.remove(2);
+						min3++;
+						index++;
 					}
-					real_list.remove(1);
 				}
-				real_list.remove(0);
+				
+				real_list.remove(1);
+				min2++;
+				real_list.add(min2);
 			}
+			real_list.remove(0);
+			min1++;
+			real_list.add(min1);
 		}
 		// for(int i1 = 0;i1 < row; i1++){
 		// if(var_num > 1){
@@ -469,15 +550,16 @@ public class Data {
 	/**
 	 * @param x1..代表约束变量数
 	 */
-	public static int countReward(ArrayList real_list) {
+	public static int countReward(ArrayList real_list,String filename) {
 		int reward = 0;
-		int num_constraint_sat = 0;
+//		int num_constraint_sat = 0;
 		int num_constraint_unsat = 0;
 		ArrayList<String> array = new ArrayList<String>();
 		// 读取数据
-		array = readFileByLines("data.txt");
+		array = readFileByLines(filename);
+		num_constraint_solve = array.size();
 		num_constraint_sat = constriantsatisfyNum(array, real_list);
-		num_constraint_unsat = array.size() - num_constraint_sat;
+		num_constraint_unsat = num_constraint_solve - num_constraint_sat;
 		reward = num_constraint_sat * 5 + (num_constraint_unsat) * (-5);
 
 		return reward;
@@ -491,8 +573,8 @@ public class Data {
 		System.out.println("列" + m_row);
 		System.out.println("行" + m_col);
 		System.out.println("State of Rewards");
-		for (int i = 0; i < m_row; i++) {
-			for (int j = 0; j < m_col; j++) {
+		for (int i = 0; i < m_col; i++) {
+			for (int j = 0; j < m_row; j++) {
 				System.out.print(grid[i][j] + "\t");
 
 			}

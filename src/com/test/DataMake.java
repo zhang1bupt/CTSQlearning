@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-public class test {
+public class DataMake {
 	public static void main(String[] args) throws IOException {
 		//readFileByLines("data.txt");
 		ArrayList arr = new ArrayList();
-		arr = buildRandomData(2,2);
-		buildDataFile("/data1.txt", arr);
+		arr = buildRandomData(3,3);
+		buildDataFile("data1.txt", arr);
 		//buildDataFile("E://data1.txt", arr);
 		
 	}
@@ -24,10 +24,11 @@ public class test {
 		String [] var_str = {"x1","x2","x3","x4","x5"};
 		String [] operator = {"+","-"};
 		String [] operator_last = {"=","!=","<","<=",">",">="};
+		/* 随机选取变量值*/
 		int var_str_index = (int) (Math.random() * var_str.length);
-		int operator_index = (int) (Math.random() * operator.length);
-		int operator_last_index = (int) (Math.random() * operator_last.length);
 		for(int i = 0;i < constraint_num;i++){
+			int operator_index = (int) (Math.random() * operator.length);
+			int operator_last_index = (int) (Math.random() * operator_last.length);
 			int currentvar = 0;
 			String build = "";
 			int con_int = (int) (Math.random() * 10);
@@ -38,11 +39,11 @@ public class test {
 				}
 			currentvar = 0; 
 			for(int j = 0;j < var.length; j++){
-				//System.out.println(i1);
+				//System.out.println(i1);组成约束表达式
 				build = build + (var[j] + "*") + var_str[j] + operator[operator_index];
 			}
-			build = build.substring(0, build.length()-1);
-			build = build + operator_last[operator_last_index] + con_int;
+			build = build.substring(0, build.length()-1);//上面循环多了一个运算符，删掉
+			build = build + operator_last[operator_last_index] + con_int;//添加最后一个运算符
 			arr.add(build);
 
 		}
