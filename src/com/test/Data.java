@@ -14,21 +14,9 @@ import java.util.Scanner;
 public class Data {
 	static Map statemap = new HashMap();
 	static int num_constraint_sat =0;
-	public int getNum_constraint_sat() {
-		return num_constraint_sat;
-	}
-
-	public void setNum_constraint_sat(int num_constraint_sat) {
-		this.num_constraint_sat = num_constraint_sat;
-	}
 	static int num_constraint_solve = 0;
-	public static int getNum_constraint_solve() {
-		return num_constraint_solve;
-	}
-
-	public static void setNum_constraint_solve(int num_constraint_solve) {
-		Data.num_constraint_solve = num_constraint_solve;
-	}
+	static int row = 0;
+	static int col = 0;
 
 	public static void main(String[] args) throws FileNotFoundException {
 
@@ -41,7 +29,7 @@ public class Data {
 		ArrayList real_list = new ArrayList();
 		real_list.add(2);
 		real_list.add(2);
-		real_list.add(2);
+		//real_list.add(2);
 		// 读取数据
 		array = readFileByLines("data1.txt");
 		num_constraint_solve = array.size();
@@ -263,27 +251,43 @@ public class Data {
 				if (str.equals("+") ) {	
 					leftsum = leftsum + Integer.parseInt((var_list.get(temp + 1)).toString());	
 				}
+				if (str.equals("-") ) {	
+					leftsum = leftsum - Integer.parseInt((var_list.get(temp + 1)).toString());	
+				}
 			}
 		}
 		//有乘号的情况
 		if(flag == 1){
 			//遍历所有乘号，并求所有乘号的积
+			int factor = 1;
 			for (int temp = 0; temp < var_list.size(); temp++) {
 				Object test = var_list.get(temp);
 				String str = test.toString();
+				if(str.toString().equals("-")){
+					factor =  -1;
+				}
 				if (str.toString().equals("*")) {// 2*2+3*2=10 1+2=3
 					// Object test1 = var_list.get(temp+1);
 					right_num = Integer.parseInt((var_list.get(temp + 1)).toString());
 					left_num = Integer.parseInt((var_list.get(temp - 1)).toString());
-					cheng_resullt = left_num * right_num;
+					cheng_resullt = factor * left_num * right_num;
 					leftsum = leftsum + cheng_resullt;
+					
 		//			cheng_result.add(cheng_resullt);
 				}
 				if (str.equals("+") && !var_list.get(temp + 2).toString().equals("*")) {
 					leftsum = leftsum + Integer.parseInt((var_list.get(temp + 1)).toString());
-					}else{
+					}else {
 						continue;
 					}
+				if(str.equals("-") && !var_list.get(temp + 2).toString().equals("*")){
+					leftsum = leftsum - Integer.parseInt((var_list.get(temp + 1)).toString());
+				}else{
+					factor  = factor * (-1);
+					continue;
+					
+				}
+				factor  = factor * (-1);
 			}
 		}
 		if(flag == 2){
@@ -449,9 +453,11 @@ public class Data {
 	public static int[][] buildRewardMatrix(int min, int max, int var_num) {
 		ArrayList real_list = new ArrayList();
 
-		int row = max - min + 1;// 列
-		int col = (int) Math.pow(row, var_num - 1);// 行
-		int[][] grid = new int[col][row];
+		col = max - min + 1;// 列
+		setCol(col);
+		row = (int) Math.pow(col, var_num - 1);// 行
+		setRow(row);
+		int[][] grid = new int[row][col];
 		int Reward = 0;
 		// 变量数量小于1返回-1
 		if (var_num < 1) {
@@ -460,20 +466,25 @@ public class Data {
 		String filename = "data1.txt";
 		// 变量数量为：1
 		if (var_num == 1) {
-			for (int i1 = 0; i1 < row; i1++) {
+			int index = 1;
+			for (int i1 = 0; i1 < col; i1++) {
 				real_list.add(min);
+				String info = "S" + index;
+				String state = "{x1:" + real_list.get(0) +  "}";
 				grid[0][i1] = countReward(real_list,filename);
+				statemap.put(info, state);
 				real_list.remove(0);
 				min++;
+				index++;
 			}
 		}
 		// 变量数量为：2
 		if (var_num == 2) {
 			int index = 1;
 			int min1 = min;// 第一层循环的起始点
-			for (int i1 = 0; i1 < row; i1++) {
+			for (int i1 = 0; i1 < col; i1++) {
 				int min2 = min;// 第二层循环的起始点
-				for (int i2 = 0; i2 < row; i2++) {
+				for (int i2 = 0; i2 < col; i2++) {
 					if (real_list.isEmpty()) {
 						real_list.add(min1);
 					}
@@ -495,11 +506,11 @@ public class Data {
 		if (var_num == 3) {
 			int index = 1;
 			int min1 = min;// 第一层循环的起始点
-			for (int i1 = 0; i1 < row; i1++) {
+			for (int i1 = 0; i1 < col; i1++) {
 				int min2 = min;// 第二层循环的起始点
-				for (int i2 = 0; i2 < row; i2++) {
+				for (int i2 = 0; i2 < col; i2++) {
 					int min3 = min;
-					for (int i3 = 0; i3 < row; i3++) {
+					for (int i3 = 0; i3 < col; i3++) {
 						if (real_list.isEmpty()) {
 							real_list.add(min1);
 						}
@@ -523,26 +534,91 @@ public class Data {
 			min1++;
 			real_list.add(min1);
 		}
-		// for(int i1 = 0;i1 < row; i1++){
-		// if(var_num > 1){
-		// for(int i2 = 0;i2 < col; i2++){
-		// if(var_num > 2){
-		// for(int i3 = 0;i3 < col; i3++){
-		// if(var_num > 3){
-		// for(int k = 0;k < col; k++){
-		//
-		// }
-		// }
-		// }
-		//
-		// }
-		// Reward = countReward();
-		// }
-		// }
-		//
-		//
-		// }
-
+		// 变量数量为：4
+		if (var_num == 4) {
+			int index = 1;
+			int min1 = min;// 第一层循环的起始点
+			for (int i1 = 0; i1 < col; i1++) {
+				int min2 = min;// 第二层循环的起始点
+				for (int i2 = 0; i2 < col; i2++) {
+					int min3 = min;
+					for (int i3 = 0; i3 < col; i3++) {
+						int min4 = min;
+						for (int i4 = 0; i4 < col; i4++) {
+							if (real_list.isEmpty()) {
+								real_list.add(min1);
+							}
+							real_list.add(min2);
+							real_list.add(min3);
+							real_list.add(min4);
+							String info = "S" + index;
+							String state = ":{x1:" + real_list.get(0) + ",x2:" + real_list.get(1) +",x3:" + real_list.get(2)+ ",x4:" + real_list.get(3) + "}";
+							grid[5*(5*i1+i2)+i3][i4] = countReward(real_list,filename);
+							statemap.put(info, state);
+							real_list.remove(3);
+							min4++;
+							index++;
+						}
+					}
+					real_list.remove(2);
+					min3++;
+					real_list.add(min3);
+				}
+				
+				real_list.remove(1);
+				min2++;
+				real_list.add(min2);
+			}
+			real_list.remove(0);
+			min1++;
+			real_list.add(min1);
+		}
+		// 变量数量为：5
+		if (var_num == 5) {
+			int index = 1;
+			int min1 = min;// 第一层循环的起始点
+			for (int i1 = 0; i1 < col; i1++) {
+				int min2 = min;// 第二层循环的起始点
+				for (int i2 = 0; i2 < col; i2++) {
+					int min3 = min;
+					for (int i3 = 0; i3 < col; i3++) {
+						int min4 = min;
+						for (int i4 = 0; i4 < col; i4++) {
+							int min5 = min;
+							for (int i5 = 0; i5 < col; i5++) {
+								if (real_list.isEmpty()) {
+									real_list.add(min1);
+								}
+								real_list.add(min2);
+								real_list.add(min3);
+								real_list.add(min4);
+								real_list.add(min5);
+								String info = "S" + index;
+								String state = ":{x1:" + real_list.get(0) + ",x2:" + real_list.get(1) +",x3:" + real_list.get(2)+ ",x4:" + real_list.get(3) + ",x5:" + real_list.get(4)+ "}";
+								grid[5*(5*(5*i1+i2)+i3)+i4][i5] = countReward(real_list,filename);
+								statemap.put(info, state);
+								real_list.remove(4);
+								min5++;
+								index++;
+							}
+						}
+						real_list.remove(3);
+						min4++;
+						real_list.add(min4);
+					}
+					real_list.remove(2);
+					min3++;
+					real_list.add(min3);
+				}
+				
+				real_list.remove(1);
+				min2++;
+				real_list.add(min2);
+			}
+			real_list.remove(0);
+			min1++;
+			real_list.add(min1);
+		}
 		return grid;
 
 	}
@@ -594,5 +670,34 @@ public class Data {
 			String out = "输出info：" + key + "状态对应Reward：" + val;
 			System.out.println(out);
 		}
+	}
+	public static int getNum_constraint_solve() {
+		return num_constraint_solve;
+	}
+
+	public static void setNum_constraint_solve(int num_constraint_solve) {
+		Data.num_constraint_solve = num_constraint_solve;
+	}
+	public int getNum_constraint_sat() {
+		return num_constraint_sat;
+	}
+
+	public void setNum_constraint_sat(int num_constraint_sat) {
+		this.num_constraint_sat = num_constraint_sat;
+	}
+	public static int getRow() {
+		return row;
+	}
+
+	public static void setRow(int row) {
+		Data.row = row;
+	}
+
+	public static int getCol() {
+		return col;
+	}
+
+	public static void setCol(int col) {
+		Data.col = col;
 	}
 }

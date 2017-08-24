@@ -12,12 +12,47 @@ public class DataMake {
 	public static void main(String[] args) throws IOException {
 		//readFileByLines("data.txt");
 		ArrayList arr = new ArrayList();
-		arr = buildRandomData(3,3);
+		arr = buildRandomData(1,1);
 		buildDataFile("data1.txt", arr);
 		//buildDataFile("E://data1.txt", arr);
 		
 	}
-	
+	public static ArrayList buildSureData(int constraint_num,int var_num){
+		ArrayList arr = new ArrayList();
+		int [] var = new int[var_num];
+		String [] var_str = {"x1","x2","x3","x4","x5"};
+		String [] operator = {"+","-"};
+		String [] operator_last = {"=","!=","<","<=",">",">="};
+		/* 随机选取变量值*/
+		int var_str_index = (int) (Math.random() * var_str.length);
+		for(int i = 0;i < constraint_num;i++){
+			int operator_index = (int) (Math.random() * operator.length);
+			int operator_last_index = (int) (Math.random() * operator_last.length);
+			int currentvar = 0;
+			String build = "";
+			int con_int = (int) (Math.random() * 10);
+			while(currentvar < var_num){	
+				//int var_int = (int) (Math.random() * 10);	
+				var[currentvar] = (int) (Math.random() * 10); //
+				currentvar++;
+				}
+			currentvar = 0; 
+			for(int j = 0;j < var.length; j++){
+				//System.out.println(i1);组成约束表达式
+				build = build + (var[j] + "*") + var_str[j] + operator[operator_index];
+			}
+			build = build.substring(0, build.length()-1);//上面循环多了一个运算符，删掉
+			build = build + operator_last[operator_last_index] + con_int;//添加最后一个运算符
+			arr.add(build);
+
+		}
+//		for(int temp = 0;temp < arr.size(); temp++){
+//			System.out.println(arr.get(temp));
+//		}
+		
+		return arr;
+		
+	}
 	public static ArrayList buildRandomData(int constraint_num,int var_num){
 		ArrayList arr = new ArrayList();
 		int [] var = new int[var_num];

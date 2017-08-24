@@ -138,38 +138,39 @@ public class setup {
 		}
 	}
 
-	public void decideStates(Data data ) {
-		int constaintsatisf_num = data.getNum_constraint_sat();
-		int total_constaintsatisf_num = data.getNum_constraint_solve();
-		// TODO Auto-generated method stub
-		for (int i = 0; i < m_row; i++) {
-			for (int j = 0; j < m_col; j++) {
-				// Set the Start State
-				if (i == 0 && j == 0)
-					grid[i][j].setType("S");
-				// Set the Goal State
-				else if (constaintsatisf_num == total_constaintsatisf_num)
-					grid[i][j].setType("G");
+//	public void decideStates(Data data ) {
+//		int constaintsatisf_num = data.getNum_constraint_sat();
+//		//int total_constaintsatisf_num = data.getNum_constraint_solve();
+//		// TODO Auto-generated method stub
+//		for (int i = 0; i < m_row; i++) {
+//			for (int j = 0; j < m_col; j++) {
+//				
+//				// Set the Start State
+//				if (i == 0 && j == 0)
+//					grid[i][j].setType("S");
+//				// Set the Goal State
+//				else if (grid[i][j] == total_constaintsatisf_num * 5)
+//					grid[i][j].setType("G");
+////
+////				// Set the Unreachable states
+////				else if (i == 3 && j == 1)
+////
+////					grid[i][j].setType("UR");
+////
+////				else if (i == 3 && j == 3)
+////
+////					grid[i][j].setType("UR");
+////
+////				else if (i == 1 && j == 1)
+////					grid[i][j].setType("P");
+////
+////				else
+////					// Set rest Terminal states
+////					grid[i][j].setType("T");
+//			}
 //
-//				// Set the Unreachable states
-//				else if (i == 3 && j == 1)
-//
-//					grid[i][j].setType("UR");
-//
-//				else if (i == 3 && j == 3)
-//
-//					grid[i][j].setType("UR");
-//
-//				else if (i == 1 && j == 1)
-//					grid[i][j].setType("P");
-//
-//				else
-//					// Set rest Terminal states
-//					grid[i][j].setType("T");
-			}
-
-		}
-	}
+//		}
+//	}
 	public void decideStates( ) {
 		
 		// TODO Auto-generated method stub
@@ -208,11 +209,15 @@ public class setup {
 	// +10 for the Goal state
 	// -50 for the Pit
 	//采用数据
-	public void setZeroRewards(Data data) {
+	public void setZeroRewards(int [][] grid1 ,int constraint_num) {
 		//Set Zero Rewards Except for the Goal and Pitt State
-	    int [][] grid1 =data.buildRewardMatrix(-2, 2, 2);
+	   // int [][] grid1 =data.buildRewardMatrix(-2, 2, 2);
+	    // int constraint_num = data.getNum_constraint_solve();
 		for (int i = 0; i < m_row; i++) {
 			for (int j = 0; j < m_col; j++) {
+				if(grid1[i][j] == 5 * constraint_num){
+					grid[i][j].setType("G");
+				}
 				grid[i][j].setReward(grid1[i][j]);
 //				if(i >= j){
 //					grid[i][j].setReward(-10);
@@ -445,14 +450,14 @@ public class setup {
 
 		return nextState;
 	}*/
-	public State get_nextState(State S, Action A, int dir) {
+	public State get_nextState(State S, Action A, int dir,int all_row, int all_col) {
 		State nextState = null;
 
 		// get row and col coordinate of the current state
 
 		int row, col;
 
-		row = S.row_pos;
+		row = S.row_pos;//行
 		col = S.col_pos;
 
 		// if up is the action
@@ -464,7 +469,7 @@ public class setup {
 			}
 			// if down is the action
 		} else if (dir == 1) {
-			if (row == 4)
+			if (row == all_row - 1)
 				nextState = null;
 			else {
 				nextState = grid[row + 1][col];
@@ -481,7 +486,7 @@ public class setup {
 
 			// if right is the action
 		} else if (dir == 3) {
-			if (col == 4)
+			if (col == all_col - 1)
 				nextState = null;
 			else {
 				nextState = grid[row][col + 1];

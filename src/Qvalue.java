@@ -7,15 +7,22 @@ public class Qvalue {
 	public static void main(String[] args) {
 		Vector<State> Allstates = new Vector<State>();
 		ArrayList<Action> Actions = new ArrayList<Action>();
-		setup s = new setup(5, 5);
 		Data data = new Data();
+		int var_min = -3;//约束取值最小值
+		int var_max = 3;//约束取值最大值
+		int var_num = 2;//定义变量的个数
+		int grid1 [][] = data.buildRewardMatrix(var_min,var_max, var_num);
+		int col = data.getCol();//获得当前约束集合列
+		int row = data.getRow();//获得当前约束集合行
+		setup s = new setup(row, col);
+		int constrint_num = data.getNum_constraint_solve();
 		//s.decideStates();
 		//1. setGivenRewards to set the Given Rewards
 		//2. setZeroRewards to set the Rewards zero for all the Terminal states
 		//except the pitt and the Goal State
-		//s.setGivenRewards();
-		s.setZeroRewards(data);
-		s.decideStates(data);
+		s.setGivenRewards();
+		s.setZeroRewards(grid1, constrint_num);//定义Reward矩阵，目前根据Reward = （5*满足数量+（-5）不满足数量）
+		//s.decideStates(data);
 		//s.setZeroRewards();
 		System.out.println("State of Rewards");
 		s.printRewards();
@@ -25,20 +32,20 @@ public class Qvalue {
 		s.set_states();
 
 		Allstates = s.get_AllStates();
-
-		solveQ(Allstates, s);
+		solveQ(Allstates, s, row, col);
+		
 
 	}
 
-	public static void solveQ(Vector<State> states, setup s) {
+	public static void solveQ(Vector<State> states, setup s,  int row,int col) {
 
 		ArrayList<ArrayList<State>> episodes = new ArrayList<ArrayList<State>>();
-
+		int State_size = states.size();	
 		double alpha = 0.1;
 		double gamma = 0.9;
-
 		double epsilon = 0.5;
 		int no_of_iterations = 0;
+		
 		System.out
 				.println("Populating Q values for 5000 iterations upation of Epsilon every 1000 iterations");
 		System.out.println();
@@ -60,8 +67,7 @@ public class Qvalue {
 				// get a Random Action based on the transitional Probabilities
 				Action nRandomisedAction = s.getRandomisedAction(rAction);
 
-				State nextState = s.get_nextState(cur_state, nRandomisedAction,
-						nRandomisedAction.action);
+				State nextState = s.get_nextState(cur_state, nRandomisedAction,nRandomisedAction.action,row, col);
 
 				if (nextState == null)
 					// Update the same state if it is an invalid state
