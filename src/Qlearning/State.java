@@ -1,3 +1,4 @@
+package Qlearning;
 public class State {
 
 	private String type;
