@@ -21,7 +21,7 @@ public class Qvalue {
 		//1. setGivenRewards to set the Given Rewards
 		//2. setZeroRewards to set the Rewards zero for all the Terminal states
 		//except the pitt and the Goal State
-		s.setGivenRewards();
+		//s.setGivenRewards();
 		s.setZeroRewards(grid1, constrint_num);//定义Reward矩阵，目前根据Reward = （5*满足数量+（-5）不满足数量）
 		//s.decideStates(data);
 		//s.setZeroRewards();

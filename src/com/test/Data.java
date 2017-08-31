@@ -700,4 +700,13 @@ public class Data {
 	public static void setCol(int col) {
 		Data.col = col;
 	}
+
+	public static Map getStatemap() {
+		return statemap;
+	}
+
+	public static void setStatemap(Map statemap) {
+		Data.statemap = statemap;
+	}
+	
 }
